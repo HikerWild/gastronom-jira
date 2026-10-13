@@ -1,0 +1,930 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="color-scheme" content="light dark">
+<meta name="description" content="Справочник для заказчиков «Гастроном Медиа»: как ставить задачи в Jira.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2307070A'/%3E%3Ctext x='32' y='43' text-anchor='middle' font-family='Arial' font-weight='700' font-size='32' fill='%23fff'%3EГ%3C/text%3E%3C/svg%3E">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui}img{max-width:100%}</style>
+<title>Задачи в Jira</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: продуктовый справочник — frosted-навигация, крупный заголовок, белые панели на серой подложке, реальные скриншоты в тренажёре и рядом с шагами */
+:root{
+  --bg:#F5F5F7; --surface:#FFFFFF; --surface-2:#FAFAFC; --fg:#1D1D1F; --muted:#6E6E73; --line:#E3E3E8; --line-strong:#D2D2D7;
+  --accent:#0B5FD6; --accent-soft:#EAF1FD; --you:#C84B0A; --you-soft:#FDEFE6; --warn:#B07A00; --warn-soft:#FFF6DC;
+  --skip:#F0F0F3; --skip-fg:#7C7C82; --jira:#0052CC; --jira-fg:#FFFFFF; --jira-soft:#E9F2FF; --shadow:0 10px 40px -18px rgba(0,0,0,.28);
+  --f-sans:"Onest",-apple-system,"SF Pro Text","Segoe UI",system-ui,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#000000; --surface:#1C1C1E; --surface-2:#232326; --fg:#F5F5F7; --muted:#A1A1A6; --line:#2C2C2E; --line-strong:#3A3A3C;
+  --accent:#5B9BFF; --accent-soft:#13243F; --you:#FF9F5A; --you-soft:#3A2416; --warn:#E8B23A; --warn-soft:#3A2F10;
+  --skip:#2A2A2D; --skip-fg:#8E8E93; --jira:#579DFF; --jira-fg:#0B1220; --jira-soft:#132A4A; --shadow:0 10px 40px -18px rgba(0,0,0,.8); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#000000; --surface:#1C1C1E; --surface-2:#232326; --fg:#F5F5F7; --muted:#A1A1A6; --line:#2C2C2E; --line-strong:#3A3A3C;
+  --accent:#5B9BFF; --accent-soft:#13243F; --you:#FF9F5A; --you-soft:#3A2416; --warn:#E8B23A; --warn-soft:#3A2F10;
+  --skip:#2A2A2D; --skip-fg:#8E8E93; --jira:#579DFF; --jira-fg:#0B1220; --jira-soft:#132A4A; --shadow:0 10px 40px -18px rgba(0,0,0,.8); color-scheme:dark}
+
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-sans);font-size:17px;line-height:1.5;-webkit-font-smoothing:antialiased}
+h1,h2,h3{margin:0;text-wrap:balance;letter-spacing:-.02em}
+h1{font-size:clamp(34px,6vw,60px);font-weight:700;line-height:1.05;letter-spacing:-.035em}
+h2{font-size:clamp(24px,3.6vw,34px);font-weight:700;line-height:1.15}
+h3{font-size:18px;font-weight:600;letter-spacing:-.01em}
+p{margin:0}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline;text-underline-offset:3px}
+code{font-family:var(--f-mono);font-size:.85em;background:var(--skip);padding:2px 6px;border-radius:5px}
+b{font-weight:600}
+.muted{color:var(--muted)}
+.lead{color:var(--muted);font-size:19px;max-width:60ch;line-height:1.45}
+.eyebrow{font-size:13px;font-weight:600;letter-spacing:.02em;color:var(--accent)}
+.note{display:inline-block;padding:2px 8px;border-radius:6px;background:var(--warn-soft);color:var(--warn);font-size:14px;font-weight:500}
+
+/* nav */
+.nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);background:color-mix(in srgb,var(--bg) 72%,transparent);border-bottom:1px solid var(--line)}
+.nav-in{max-width:1040px;margin:0 auto;padding:0 20px;height:52px;display:flex;align-items:center;gap:20px}
+.brand{font-weight:700;letter-spacing:-.02em;font-size:15px;white-space:nowrap;color:var(--fg)}
+.brand:hover{text-decoration:none}
+.brand span{color:var(--muted);font-weight:500;margin-left:6px}
+.nav-links{display:flex;gap:14px;margin-left:auto;overflow-x:auto;scrollbar-width:none;font-size:13px;min-width:0}
+
+.nav-links::-webkit-scrollbar{display:none}
+.nav-links a{color:var(--muted);white-space:nowrap}
+.nav-links a:hover{color:var(--fg);text-decoration:none}
+
+.wrap{max-width:1040px;margin:0 auto;padding-inline:20px;padding-block:56px 72px;display:flex;flex-direction:column;gap:28px}
+
+/* theme toggle */
+.theme{width:36px;height:36px;border-radius:50%;border:1px solid var(--line);background:var(--surface);cursor:pointer;display:grid;place-items:center;flex:none;color:var(--fg)}
+.theme svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;grid-area:1/1}
+.theme .moon{display:none}
+:root[data-theme="dark"] .theme .moon{display:block}
+:root[data-theme="dark"] .theme .sun{display:none}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .theme .moon{display:block}:root:not([data-theme="light"]) .theme .sun{display:none}}
+.theme:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* burger menu */
+.burger{display:none;margin-left:0;width:40px;height:40px;border:0;background:transparent;cursor:pointer;flex-direction:column;justify-content:center;gap:6px;align-items:center;border-radius:10px}
+.burger span{display:block;width:20px;height:2px;background:var(--fg);border-radius:2px;transition:transform .2s,opacity .2s}
+.burger[aria-expanded="true"] span:first-child{transform:translateY(4px) rotate(45deg)}
+.burger[aria-expanded="true"] span:last-child{transform:translateY(-4px) rotate(-45deg)}
+.menu{max-width:1040px;margin:0 auto;padding:8px 20px 16px;display:grid;grid-template-columns:1fr 1fr;gap:4px;border-top:1px solid var(--line)}
+.menu a{padding:12px 14px;border-radius:12px;color:var(--fg);font-weight:500}
+.menu a:hover{background:var(--surface);text-decoration:none}
+@media (max-width:1100px){.nav-links{display:none}.burger{display:flex}.nav-in .theme{margin-left:auto}}
+
+/* hero — тёмная сцена со стеклом и свечением; тема страницы на неё не влияет */
+.hero{--h-fg:#F5F5F7;--h-muted:rgba(245,245,247,.68);--g1:#6D5BFF;--g2:#2FC4FF;--g3:#FF4F9A;--glass:rgba(255,255,255,.07);--glass-line:rgba(255,255,255,.16);
+  position:relative;isolation:isolate;overflow:hidden;color:var(--h-fg);background:#07070A;border-radius:28px;padding:clamp(28px,5vw,56px);
+  display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);grid-template-areas:"brand brand" "text bento" "search bento";column-gap:40px;row-gap:24px;align-items:start;margin-top:4px}
+.brandmark{grid-area:brand}.hero-text{grid-area:text}.hero-search{grid-area:search;display:flex;flex-direction:column;gap:14px;min-width:0}.bento{grid-area:bento;align-self:end}
+.hero .eyebrow{color:#9DB8FF}
+.hero .lead{color:var(--h-muted)}
+.hero h1{max-width:12ch;color:var(--h-fg)}
+.orbs{position:absolute;inset:0;z-index:-1;pointer-events:none;overflow:hidden}
+.orbs i{position:absolute;border-radius:50%;filter:blur(60px);opacity:.95;will-change:transform}
+.orbs .o1{width:46vw;height:46vw;max-width:620px;max-height:620px;left:-10%;top:-30%;background:radial-gradient(circle,var(--g1),transparent 68%);animation:drift1 18s ease-in-out infinite alternate}
+.orbs .o2{width:40vw;height:40vw;max-width:560px;max-height:560px;right:-8%;top:-18%;background:radial-gradient(circle,var(--g2),transparent 68%);animation:drift2 22s ease-in-out infinite alternate}
+.orbs .o3{width:34vw;height:34vw;max-width:460px;max-height:460px;left:38%;bottom:-40%;background:radial-gradient(circle,var(--g3),transparent 68%);opacity:.5;animation:drift3 26s ease-in-out infinite alternate}
+@keyframes drift1{to{transform:translate(8%,12%) scale(1.08)}}
+@keyframes drift2{to{transform:translate(-10%,10%) scale(1.12)}}
+@keyframes drift3{to{transform:translate(-12%,-10%) scale(1.05)}}
+.hero::after{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(120% 80% at 50% 110%,rgba(7,7,10,.0),rgba(7,7,10,.55) 70%),linear-gradient(180deg,rgba(255,255,255,.04),transparent 30%)}
+
+/* wordmark */
+.brandmark{grid-column:1/-1;display:flex;flex-direction:column;gap:6px;padding-bottom:clamp(8px,2vw,20px);min-width:0;user-select:none;align-items:flex-start}
+.logo-wrap{position:relative;width:min(100%,560px);margin-left:-3%}
+.logo{display:block;width:100%;height:auto;mix-blend-mode:screen;transform:translate3d(var(--px,0),var(--py,0),0);transition:transform .12s ease-out}
+.logo-glow{position:absolute;inset:8% 4%;border-radius:50%;background:radial-gradient(60% 50% at 50% 55%,rgba(109,91,255,.55),rgba(47,196,255,.25) 50%,transparent 75%);filter:blur(40px);transform:translate3d(calc(var(--px,0) * -1.6),calc(var(--py,0) * -1.6),0);transition:transform .12s ease-out;animation:breathe 7s ease-in-out infinite alternate}
+@keyframes breathe{to{opacity:.6;transform:translate3d(calc(var(--px,0) * -1.6),calc(var(--py,0) * -1.6),0) scale(1.08)}}
+@media (max-width:860px){.logo-wrap{width:min(100%,360px);margin-left:-2%}}
+@media (prefers-reduced-motion:reduce){.logo,.logo-glow{transition:none;animation:none;transform:none!important}}
+.tag-line{font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--h-muted);font-weight:500;padding-bottom:.4em}
+@media (max-width:600px){.tag-line{font-size:11px;letter-spacing:.1em;flex-basis:100%;padding-top:6px}}
+
+.hero-text{display:flex;flex-direction:column;gap:22px;min-width:0}
+
+/* стеклянные плитки */
+.bento{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-rows:minmax(118px,auto);gap:12px;min-width:0}
+.tile{display:flex;flex-direction:column;justify-content:flex-end;gap:4px;padding:18px;border-radius:22px;color:var(--h-fg);min-width:0;position:relative;overflow:hidden;
+  background:var(--glass);backdrop-filter:blur(22px) saturate(170%);-webkit-backdrop-filter:blur(22px) saturate(170%);
+  border:1px solid var(--glass-line);box-shadow:inset 0 1px 0 rgba(255,255,255,.22),inset 0 -1px 0 rgba(255,255,255,.04),0 24px 60px -30px rgba(0,0,0,.7);
+  transition:transform .25s,background .25s,border-color .25s}
+.tile::before{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(120% 60% at 15% 0%,rgba(255,255,255,.18),transparent 55%)}
+.tile::after{content:"";position:absolute;inset:-1px;pointer-events:none;border-radius:inherit;background:linear-gradient(135deg,rgba(255,255,255,.25),transparent 35%,transparent 65%,rgba(255,255,255,.12));-webkit-mask:linear-gradient(#000,#000) content-box,linear-gradient(#000,#000);-webkit-mask-composite:xor;mask-composite:exclude;padding:1px;opacity:.9}
+.tile:hover{text-decoration:none;transform:translateY(-3px);background:rgba(255,255,255,.11);border-color:rgba(255,255,255,.28)}
+.tile:focus-visible{outline:2px solid #9DB8FF;outline-offset:2px}
+.tile svg{width:22px;height:22px;stroke:#CFE0FF;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;margin-bottom:auto;filter:drop-shadow(0 0 8px rgba(47,196,255,.55))}
+.tile b{font-weight:600;letter-spacing:-.01em;line-height:1.2}
+.tile span{font-size:13px;color:var(--h-muted);line-height:1.35}
+.tile.big{grid-column:span 2;padding:22px;background:linear-gradient(135deg,rgba(109,91,255,.35),rgba(47,196,255,.18) 60%,rgba(255,79,154,.22));border-color:rgba(255,255,255,.3)}
+.tile.big b{font-size:22px}
+.tile.big span{color:rgba(245,245,247,.8);font-size:14px}
+@media (max-width:860px){.hero{grid-template-columns:1fr;grid-template-areas:"brand" "text" "bento" "search";row-gap:22px;border-radius:22px}.bento{grid-auto-rows:minmax(96px,auto)}.tile.big{padding:18px}.tile.big b{font-size:19px}}
+@media (prefers-reduced-motion:reduce){.tile,.burger span{transition:none}.orbs i{animation:none}}
+
+/* стеклянный поиск */
+.search{position:relative;max-width:640px}
+.search input{width:100%;font:inherit;font-size:18px;padding:16px 48px 16px 52px;border-radius:999px;border:1px solid var(--glass-line);background:var(--glass);color:var(--h-fg);
+  backdrop-filter:blur(22px) saturate(170%);-webkit-backdrop-filter:blur(22px) saturate(170%);box-shadow:inset 0 1px 0 rgba(255,255,255,.22),0 24px 60px -30px rgba(0,0,0,.7)}
+.search input::placeholder{color:var(--h-muted)}
+.search input:focus{outline:none;border-color:rgba(157,184,255,.9);box-shadow:inset 0 1px 0 rgba(255,255,255,.22),0 0 0 4px rgba(109,91,255,.25)}
+.search input::-webkit-search-cancel-button{-webkit-appearance:none}
+.search svg{position:absolute;left:20px;top:50%;transform:translateY(-50%);width:20px;height:20px;stroke:var(--h-muted);fill:none;stroke-width:2}
+.search .clear{position:absolute;right:10px;top:50%;transform:translateY(-50%);width:32px;height:32px;border-radius:50%;border:0;background:rgba(255,255,255,.14);color:var(--h-fg);cursor:pointer;font-size:14px}
+.hero .chip{border-color:var(--glass-line);color:var(--h-fg);background:rgba(255,255,255,.04)}
+.hero .chip:hover,.hero .chip:focus-visible{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.4)}
+.results{border:1px solid var(--accent);scroll-margin-top:72px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font:inherit;font-size:14px;font-weight:500;padding:7px 14px;border-radius:999px;border:1px solid var(--line-strong);background:transparent;color:var(--fg);cursor:pointer}
+.chip:hover,.chip:focus-visible{background:var(--surface);border-color:var(--fg);outline:none}
+
+/* panels */
+.panel{background:var(--surface);border-radius:24px;padding:clamp(24px,4vw,44px);display:flex;flex-direction:column;gap:26px;scroll-margin-top:72px}
+.sec-head{display:flex;flex-direction:column;gap:8px;max-width:720px}
+.two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:32px;align-items:start}
+@media (max-width:760px){.two{grid-template-columns:1fr}}
+
+/* steps */
+.steps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.steps li{display:grid;grid-template-columns:44px 1fr;gap:12px;padding:16px 0;border-top:1px solid var(--line)}
+.steps li:first-child{border-top:0;padding-top:0}
+.num{font-size:28px;font-weight:300;line-height:1;color:var(--muted);letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.steps div{min-width:0;display:flex;flex-direction:column;gap:4px}
+.steps p{color:var(--muted);font-size:16px}
+
+/* screenshots */
+figure.shot{margin:0;display:flex;flex-direction:column;gap:10px;min-width:0}
+figure.shot .frame{border-radius:14px;overflow:hidden;border:1px solid var(--line);background:#fff;box-shadow:var(--shadow);cursor:zoom-in;line-height:0}
+figure.shot img{width:100%;height:auto;display:block}
+figure.shot figcaption{font-size:14px;color:var(--muted);line-height:1.4}
+figure.shot figcaption b{color:var(--fg)}
+.shots{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px}
+
+/* fields table */
+.table-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:16px}
+table{border-collapse:collapse;width:100%;min-width:560px;font-size:15px}
+th,td{text-align:left;padding:12px 16px;border-bottom:1px solid var(--line);vertical-align:top}
+tr:last-child td{border-bottom:0}
+th{font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);font-weight:600;background:var(--surface-2)}
+td.n{font-family:var(--f-mono);font-size:13px;color:var(--muted);width:40px}
+td.f{font-weight:600;white-space:nowrap}
+tr.skip td{color:var(--skip-fg)}
+.tag{font-size:12px;font-weight:600;padding:3px 9px;border-radius:999px;white-space:nowrap;display:inline-block}
+.tag.fill,.tag.pick{background:var(--accent-soft);color:var(--accent)}
+.tag.pick{outline:1px dashed var(--accent);outline-offset:-1px}
+.tag.skip{background:var(--skip);color:var(--skip-fg)}
+.tag.you{background:var(--you-soft);color:var(--you)}
+.legend{display:flex;flex-wrap:wrap;gap:10px 18px;font-size:14px;color:var(--muted);align-items:center}
+details.more{border-top:1px solid var(--line);padding-top:8px}
+details.more summary{cursor:pointer;font-weight:600;padding:10px 0;list-style:none;display:flex;align-items:center;gap:8px}
+details.more summary::-webkit-details-marker{display:none}
+details.more summary::before{content:"";width:8px;height:8px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(-45deg);transition:transform .2s}
+details.more[open] summary::before{transform:rotate(45deg)}
+details.more .body{display:flex;flex-direction:column;gap:14px;padding-top:8px}
+
+/* prep + brief */
+.prep{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
+.prep-item{display:flex;flex-direction:column;gap:4px;padding:14px 16px;border-radius:14px;background:var(--surface-2);border:1px solid var(--line);font-size:15px}
+.prep-item span{color:var(--muted)}
+.prep-item.mode{background:var(--accent-soft);border-color:transparent}
+.prep-item.mode span{color:var(--fg)}
+.switch{display:flex;align-items:center;gap:12px;cursor:pointer;font-size:15px;font-weight:500}
+.switch small{font-weight:400;color:var(--muted)}
+.switch input{position:absolute;opacity:0;width:1px;height:1px}
+.sw{width:44px;height:26px;border-radius:999px;background:var(--line-strong);position:relative;flex:none;transition:background .2s}
+.sw::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.3);transition:transform .2s}
+.switch input:checked + .sw{background:var(--accent)}
+.switch input:checked + .sw::after{transform:translateX(18px)}
+.switch input:focus-visible + .sw{outline:2px solid var(--accent);outline-offset:2px}
+.brief{display:flex;flex-direction:column;gap:18px;padding-top:8px;border-top:1px solid var(--line);scroll-margin-top:72px}
+.h3lg{font-size:22px}
+.brief-card{border:1px solid var(--line);border-radius:16px;background:var(--surface-2);padding:16px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.brief-head{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.brief-card pre{margin:0;font:inherit;font-size:14px;line-height:1.5;white-space:pre-wrap;overflow-wrap:anywhere;color:var(--fg)}
+.copybtn{font:inherit;font-weight:600;font-size:13px;padding:6px 12px;border-radius:999px;border:1px solid var(--fg);background:var(--fg);color:var(--bg);cursor:pointer}
+.copybtn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.lbl{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 8px;border-radius:999px;margin-bottom:6px}
+.was .lbl{background:var(--you-soft);color:var(--you)}
+.became .lbl{background:var(--accent-soft);color:var(--accent)}
+.was p{color:var(--muted);font-style:italic}
+.small{font-size:13px;margin-top:8px}
+
+/* simulator */
+.sim{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:24px;align-items:start}
+.jira{border:1px solid var(--line);border-radius:14px;background:var(--surface);overflow:hidden;font-size:14px;box-shadow:var(--shadow)}
+.jira-head{padding:12px 16px;border-bottom:1px solid var(--line);font-weight:600;font-size:15px;display:flex;justify-content:space-between;align-items:center;background:var(--surface-2)}
+.jx{color:var(--muted);font-weight:400}
+.jira-body{padding:8px;display:flex;flex-direction:column;max-height:520px;overflow:auto}
+.jf{display:grid;grid-template-columns:140px minmax(0,1fr);gap:12px;padding:8px;border-radius:8px;cursor:pointer;align-items:center;border:2px solid transparent}
+.jf:hover{background:var(--skip)}
+.jf:focus-visible{outline:2px solid var(--jira);outline-offset:1px}
+.jl{text-align:right;color:var(--muted);font-size:13px;line-height:1.3}
+.jf.req .jl::after{content:" *";color:var(--you)}
+.jf.on{border-color:var(--jira);background:var(--jira-soft)}
+.jf.on .jl{color:var(--fg);font-weight:600}
+.jf.skip .jctl{opacity:.55}
+.jf.dim{opacity:.5}
+.jf.dim.on{opacity:1}
+figure.shot .frame:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+.jctl{min-width:0;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.jin{flex:1 1 160px;min-width:0;border:1px solid var(--line-strong);border-radius:4px;padding:6px 8px;background:var(--bg);color:var(--fg);font-size:14px;line-height:1.35;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.jin.ph{color:var(--muted)}
+.jin.dd::after{content:" ▾";float:right;color:var(--muted)}
+.jin.area{white-space:normal;height:64px}
+.jtool{display:flex;gap:10px;font-family:var(--f-mono);font-size:12px;color:var(--muted);width:100%}
+.jsel{flex:1 1 160px;min-width:0;font:inherit;font-size:14px;border:1px solid var(--line-strong);border-radius:4px;padding:6px 8px;background:var(--bg);color:var(--fg)}
+.jira-foot{padding:12px 16px;border-top:1px solid var(--line);display:flex;justify-content:flex-end;gap:14px;align-items:center}
+.jlink{color:var(--jira);font-size:14px}
+.jbtn{font:inherit;font-size:14px;font-weight:600;padding:7px 14px;border-radius:4px;border:2px solid transparent;background:var(--jira);color:var(--jira-fg);cursor:pointer}
+.jbtn.on{border-color:var(--you);box-shadow:0 0 0 3px var(--you-soft)}
+.hint{background:var(--surface-2);border:1px solid var(--line);border-radius:18px;padding:18px;display:flex;flex-direction:column;gap:12px;position:sticky;top:calc(env(safe-area-inset-top,0px) + 64px)}
+.hint-top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.stepno{font-family:var(--f-mono);font-size:12px;color:var(--muted)}
+.bar{height:3px;border-radius:2px;background:var(--line);overflow:hidden}
+.bar span{display:block;height:100%;background:var(--accent);transition:width .25s}
+.hshot{border-radius:10px;overflow:hidden;border:1px solid var(--line);background:#fff;line-height:0;cursor:zoom-in}
+.hshot img{width:100%;height:auto;display:block;max-height:260px;object-fit:contain;object-position:top left;background:#fff}
+.hint p{color:var(--muted);font-size:15px}
+.hint-nav{display:flex;gap:8px;margin-top:2px}
+.hbtn{font:inherit;font-weight:600;font-size:15px;padding:10px 14px;border-radius:999px;border:1px solid var(--fg);background:var(--fg);color:var(--bg);cursor:pointer;flex:1}
+.hbtn.ghost{background:transparent;color:var(--fg)}
+.hbtn:disabled{opacity:.35;cursor:default}
+.hbtn:focus-visible{outline:3px solid var(--accent-soft);outline-offset:2px}
+@media (max-width:760px){
+  .sim{grid-template-columns:1fr}
+  .hint{order:-1;top:calc(env(safe-area-inset-top,0px) + 56px);z-index:2;box-shadow:var(--shadow)}
+  .hshot img{max-height:180px}
+  .jira-body{max-height:none}
+}
+@media (max-width:520px){.jf{grid-template-columns:1fr;gap:4px}.jl{text-align:left}}
+
+/* boards */
+.boards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.board{background:var(--surface-2);border:1px solid var(--line);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.board h3{font-size:16px}
+.board .who{font-size:14px;color:var(--muted)}
+.board .route{font-size:12px;color:var(--muted);font-family:var(--f-mono)}
+.board .ex{font-size:14px;color:var(--fg);line-height:1.4}
+.pick-rule{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.pick-rule div{padding:14px 16px;border-radius:14px;background:var(--accent-soft);font-size:15px;display:flex;flex-direction:column;gap:4px}
+.pick-rule b{font-weight:600}
+.pick-rule span{color:var(--fg);opacity:.85}
+.board a{font-size:14px;font-weight:500;margin-top:4px}
+
+/* statuses */
+.flow{display:flex;flex-direction:column}
+.st{display:grid;grid-template-columns:minmax(170px,240px) 1fr;gap:16px;padding:12px 0;border-top:1px solid var(--line);align-items:start}
+.st:first-child{border-top:0;padding-top:0}
+.pill{font-size:13px;font-weight:600;padding:6px 12px;border-radius:999px;border:1px solid var(--line-strong);background:var(--surface);justify-self:start}
+.st.you .pill{background:var(--you-soft);border-color:var(--you);color:var(--you)}
+.st.opt .pill{border-style:dashed}
+.st p{color:var(--muted);min-width:0;font-size:16px}
+.st .who{display:block;font-size:12px;font-weight:600;letter-spacing:.03em;text-transform:uppercase;color:var(--muted);margin-bottom:2px}
+.st.you .who{color:var(--you)}
+@media (max-width:540px){.st{grid-template-columns:1fr;gap:6px}}
+
+/* rules */
+.rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+.rule{padding:20px;border-radius:16px;background:var(--surface-2);border:1px solid var(--line);display:flex;flex-direction:column;gap:6px}
+.rule p{color:var(--muted);font-size:15px}
+.rule.hot{background:var(--accent-soft);border-color:transparent}
+.rule.hot p{color:var(--fg)}
+
+/* faq */
+.faq{display:flex;flex-direction:column;border-top:1px solid var(--line)}
+details.q{border-bottom:1px solid var(--line)}
+details.q summary{cursor:pointer;list-style:none;padding:16px 36px 16px 0;font-weight:600;position:relative;font-size:17px}
+details.q summary::-webkit-details-marker{display:none}
+details.q summary::after{content:"+";position:absolute;right:4px;top:11px;font-size:24px;font-weight:300;color:var(--muted)}
+details.q[open] summary::after{content:"–"}
+details.q summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
+.ans{padding:0 0 18px;color:var(--muted);display:flex;flex-direction:column;gap:8px;max-width:66ch;font-size:16px}
+mark{background:var(--warn-soft);color:var(--fg);border-radius:2px}
+.empty{padding:20px;border-radius:14px;border:1px dashed var(--line-strong);color:var(--muted)}
+.count{font-size:14px;color:var(--muted)}
+
+/* links */
+.links{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.links a{display:flex;flex-direction:column;gap:2px;padding:16px 18px;border-radius:16px;border:1px solid var(--line);background:var(--surface-2);min-width:0}
+.links a:hover{border-color:var(--fg);text-decoration:none}
+.links b{color:var(--fg);font-weight:600}
+.links span{color:var(--muted);font-size:14px}
+
+/* contacts */
+.contact{background:var(--fg);color:var(--bg);border-radius:24px;padding:clamp(24px,4vw,44px);display:flex;flex-direction:column;gap:22px;scroll-margin-top:72px}
+.contact h2{color:var(--bg)}
+.contact > p{opacity:.75;font-size:17px}
+.people{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));grid-template-rows:auto auto auto auto auto;gap:14px}
+.person{display:grid;grid-template-rows:subgrid;grid-row:span 5;row-gap:8px;padding:20px;border-radius:16px;background:color-mix(in srgb,var(--bg) 10%,transparent);min-width:0;align-content:start}
+.person .role{font-size:12px;font-weight:600;letter-spacing:.03em;text-transform:uppercase;opacity:.65}
+.person .name{font-size:20px;font-weight:600;letter-spacing:-.01em}
+.person .about{font-size:15px;opacity:.75;margin-bottom:6px}
+.row{display:grid;grid-template-columns:52px minmax(0,1fr) 36px;gap:8px;align-items:center;height:40px;border-radius:10px;background:color-mix(in srgb,var(--bg) 10%,transparent);padding-left:12px}
+.lbl-c{font-size:12px;font-weight:600;opacity:.6;letter-spacing:.02em}
+.handle{font-family:var(--f-mono);font-size:13px;user-select:all;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ic{width:36px;height:40px;border:0;background:transparent;color:var(--bg);cursor:pointer;display:grid;place-items:center;border-radius:0 10px 10px 0;opacity:.75}
+.ic svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.ic:hover{opacity:1;background:color-mix(in srgb,var(--bg) 14%,transparent)}
+.ic:focus-visible{outline:2px solid var(--bg);outline-offset:-2px}
+.ic.ok svg{stroke:#6EE7A8}
+.foot{display:flex;flex-direction:column;gap:14px;padding:8px 20px 0;color:var(--muted);font-size:14px;line-height:1.55}
+.foot-credit{display:flex;flex-direction:column;gap:4px;padding:18px 20px;border-radius:16px;border:1px solid var(--line);background:var(--surface);max-width:72ch}
+.foot-title{font-weight:600;color:var(--fg)}
+.foot-meta{font-size:13px}
+.handle-l{font-family:var(--f-mono);font-size:.92em;user-select:all;color:var(--fg)}
+
+/* lightbox */
+dialog.lb{border:0;padding:0;background:transparent;max-width:min(96vw,1400px);width:auto}
+dialog.lb::backdrop{background:rgba(0,0,0,.72);backdrop-filter:blur(8px)}
+dialog.lb img{max-width:min(96vw,1400px);max-height:88vh;display:block;border-radius:12px;background:#fff}
+dialog.lb .cap{color:#fff;font-size:14px;text-align:center;padding:10px;opacity:.85}
+dialog.lb button{position:absolute;top:8px;right:8px;width:36px;height:36px;border-radius:50%;border:0;background:rgba(0,0,0,.55);color:#fff;font-size:20px;cursor:pointer}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.bar span{transition:none}}
+</style>
+</head>
+<body>
+
+
+<nav class="nav" aria-label="Разделы">
+  <div class="nav-in">
+    <a class="brand" href="#top">Гастроном Медиа <span>Jira</span></a>
+    <div class="nav-links" id="navlinks">
+      <a href="#create">Новая задача</a><a href="#access">Вход</a><a href="#teams">Команды</a><a href="#statuses">Статусы</a><a href="#review">Правки</a><a href="#proof">Корректоры</a><a href="#notify">Уведомления</a><a href="#links">Ссылки</a><a href="#faq-sec">FAQ</a><a href="#contact">Контакты</a>
+    </div>
+    <button class="theme" id="theme" type="button" aria-label="Переключить тему" title="Светлая / тёмная тема">
+      <svg class="sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+      <svg class="moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg>
+    </button>
+    <button class="burger" id="burger" type="button" aria-label="Меню" aria-expanded="false" aria-controls="menu"><span></span><span></span></button>
+  </div>
+  <div class="menu" id="menu" hidden>
+    <a href="#create">Новая задача</a><a href="#access">Вход и доступ</a><a href="#teams">Команды и лиды</a><a href="#statuses">Статусы</a><a href="#review">Правки и общение</a><a href="#proof">Корректоры</a><a href="#notify">Уведомления</a><a href="#links">Ссылки</a><a href="#faq-sec">Частые вопросы</a><a href="#contact">Контакты</a>
+  </div>
+</nav>
+
+<div class="wrap" id="top">
+  <header class="hero">
+    <div class="orbs" aria-hidden="true"><i class="o1"></i><i class="o2"></i><i class="o3"></i></div>
+    <div class="brandmark">
+      <div class="logo-wrap" id="logo"><div class="logo-glow" aria-hidden="true"></div><img class="logo" src="img/logo.jpg" alt="Гастроном Медиа" width="1278" height="494" fetchpriority="high"></div>
+      <span class="tag-line">Справочник заказчика</span>
+    </div>
+    <div class="hero-text">
+      <span class="eyebrow">Для заказчиков</span>
+      <h1>Как поставить задачу в&nbsp;Jira</h1>
+      <p class="lead">Выберите команду, подготовьте бриф и заполните поля по подсказкам. Здесь же — ответы на вопросы, которые обычно задают в чате.</p>
+    </div>
+    <div class="hero-search">
+      <div class="search" role="search">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+        <input id="q" type="search" placeholder="Доступ, правки, письма…" aria-label="Поиск по вопросам" autocomplete="off">
+        <button type="button" class="clear" id="qclear" aria-label="Очистить" hidden>✕</button>
+      </div>
+      <div class="chips" aria-label="Частые темы">
+        <button class="chip" data-q="доступ">Нет доступа</button>
+        <button class="chip" data-q="команд">Какую команду выбрать</button>
+        <button class="chip" data-q="правк">Как дать правки</button>
+        <button class="chip" data-q="писем">Много писем</button>
+        <button class="chip" data-q="зависла">Задача зависла</button>
+      </div>
+    </div>
+    <nav class="bento" aria-label="Быстрые переходы">
+      <a class="tile big" href="#create"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg><b>Поставить задачу</b><span>Тренажёр формы с подсказками и скриншотами к каждому полю</span></a>
+      <a class="tile" href="#proof"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h10M4 17h7"/></svg><b>Корректору</b><span>Вычитка макета</span></a>
+      <a class="tile" href="#access"><svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><b>Нет доступа</b><span>Вход и доски</span></a>
+      <a class="tile" href="#review"><svg viewBox="0 0 24 24"><path d="M4 20l4-1 11-11-3-3L5 16z"/></svg><b>Дать правки</b><span>Как согласовать</span></a>
+      <a class="tile" href="#statuses"><svg viewBox="0 0 24 24"><path d="M4 12h5l2-5 3 10 2-5h4"/></svg><b>Статусы</b><span>Где задача сейчас</span></a>
+      <a class="tile" href="#notify"><svg viewBox="0 0 24 24"><path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4zM10 20h4"/></svg><b>Меньше писем</b><span>Настроить уведомления</span></a>
+      <a class="tile" href="#teams"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3 19a6 6 0 0 1 12 0M14 19a4.5 4.5 0 0 1 7 0"/></svg><b>Команды и лиды</b><span>Кто за что отвечает</span></a>
+    </nav>
+  </header>
+
+  <section class="panel results" id="results" aria-labelledby="res-h" hidden>
+    <div class="sec-head">
+      <span class="eyebrow">Ответы</span>
+      <h2 id="res-h">По вашему запросу</h2>
+      <span class="count" id="count" aria-live="polite"></span>
+    </div>
+    <div class="faq" id="faq"></div>
+    <div class="empty" id="empty" hidden>Ничего не нашлось. Вопросы по процессу — Виктору Беню, технические — Богдану Миленковичу. <a href="#contact">Контакты</a>.</div>
+  </section>
+
+  <section class="panel" id="create" aria-labelledby="create-h">
+    <div class="sec-head">
+      <span class="eyebrow">Новая задача</span>
+      <h2 id="create-h">Форма задачи по шагам</h2>
+      <p class="lead">Выберите поле, чтобы увидеть подсказку и скриншот Jira, или проходите шаги кнопкой «Далее».</p>
+    </div>
+    <div class="prep">
+      <div class="prep-item"><b>До создания задачи</b><span>1. Есть доступ к Jira — <a href="#access">проверить</a>. 2. Знаете команду — <a href="#teams">выбрать</a>. 3. Собрали материалы для брифа — <a href="#brief">шаблон</a>.</span></div>
+      <div class="prep-item mode"><b>Это учебный пример</b><span>Задача здесь не создаётся. Когда будете готовы — <a href="https://track.magnit.ru/projects/DCGASTRONOM/issues/DCGASTRONOM-5?filter=allopenissues" target="_blank" rel="noopener">откройте Jira</a> и нажмите «Создать».</span></div>
+    </div>
+    <label class="switch"><input type="checkbox" id="onlymine" checked><span class="sw" aria-hidden="true"></span><span>Только поля, которые заполняет заказчик <small>— автоматические поля остаются в форме, но шаги по ним пропускаются</small></span></label>
+
+    <div class="sim" id="sim">
+      <div class="jira" aria-label="Тренажёр формы создания задачи">
+        <div class="jira-head"><span>Создание задачи</span><span class="jx" aria-hidden="true">✕</span></div>
+        <div class="jira-body" id="jbody"></div>
+        <div class="jira-foot">
+          <span class="jlink">Отмена</span>
+          <button type="button" class="jbtn" id="jcreate">Создать</button>
+        </div>
+      </div>
+      <aside class="hint" id="hint" aria-live="polite">
+        <div class="hint-top"><span class="stepno" id="hno"></span><span class="tag" id="htag"></span></div>
+        <div class="bar"><span id="hbar"></span></div>
+        <div class="hshot" id="hshot" role="button" tabindex="0" aria-label="Открыть скриншот крупно"><img id="himg" src="img/create.jpg" alt=""></div>
+        <h3 id="htitle"></h3>
+        <p id="htext"></p>
+        <div class="hint-nav">
+          <button type="button" class="hbtn ghost" id="hprev">Назад</button>
+          <button type="button" class="hbtn" id="hnext">Далее</button>
+        </div>
+      </aside>
+    </div>
+
+    <div class="brief" id="brief">
+      <div class="sec-head">
+        <span class="eyebrow">Поле «Описание»</span>
+        <h3 class="h3lg">Как выглядит полный бриф</h3>
+        <p class="muted">Скопируйте шаблон в описание задачи и заполните. Чем точнее бриф, тем меньше раундов правок.</p>
+      </div>
+      <div class="two">
+        <div class="brief-card">
+          <div class="brief-head"><b>Шаблон</b><button class="copybtn" type="button" id="copybrief">Скопировать</button></div>
+<pre id="brieftpl">Задача: что нужно сделать
+Зачем: цель и повод (акция, запуск, сезон)
+Аудитория: для кого
+Ключевое сообщение: главная мысль одной фразой
+Что сдаём: список носителей и форматов с размерами
+Материалы: ссылки на KV (ключевой визуал), тексты, фото, логотипы
+Обязательные элементы: юридические плашки, цены, сроки акции
+Срок: дата и к чему она привязана
+Согласует: кто даёт финальное «да»</pre>
+        </div>
+        <div class="brief-card example">
+          <div class="brief-head"><b>Пример: баннер в приложение</b></div>
+          <div class="was"><span class="lbl">Было</span><p>«Нужен баннер на кофе, срочно, до пятницы»</p></div>
+          <div class="became"><span class="lbl">Стало</span>
+<pre>Задача: баннер в приложение «Магнит» под акцию «Неделя кофе»
+Зачем: анонс скидки 30% на кофе 20–26 октября
+Аудитория: покупатели приложения, 25–45 лет
+Ключевое сообщение: «Неделя кофе: −30% на весь кофе»
+Что сдаём: главный баннер 1080×540, сторис 1080×1920
+Материалы: KV акции — ссылка, фото товаров — ссылка
+Обязательные элементы: плашка «Сроки акции 20–26.10», юр. текст
+Срок: 17 октября — выгрузка в приложение 18-го
+Согласует: бренд-менеджер формата</pre>
+            <p class="muted small">Такой бриф снимает четыре вопроса, которые иначе зададут в комментариях: размеры, сроки, юридический текст и кто согласует.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <details class="more">
+      <summary>Все поля формы одним списком</summary>
+      <div class="body">
+        <div class="legend"><span><span class="tag fill">заполнить</span> пишете сами</span><span><span class="tag pick">выбрать</span> из списка</span><span><span class="tag skip">не трогать</span> оставить как есть</span></div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>#</th><th>Поле</th><th></th><th>Что делать</th></tr></thead>
+            <tbody>
+              <tr><td class="n">1</td><td class="f">Проект</td><td><span class="tag pick">проверить</span></td><td>Должно стоять <b>Design_Center_Gastronom</b>.</td></tr>
+              <tr><td class="n">2</td><td class="f">Тип задачи</td><td><span class="tag pick">выбрать</span></td><td><b>Задача</b>.</td></tr>
+              <tr><td class="n">3</td><td class="f">Тема</td><td><span class="tag fill">заполнить</span></td><td>Название задачи: коротко и понятно, что нужно.</td></tr>
+              <tr class="skip"><td class="n">4</td><td class="f">Автор</td><td><span class="tag skip">не трогать</span></td><td>Заполняется автоматически.</td></tr>
+              <tr><td class="n">5</td><td class="f">Компоненты</td><td><span class="tag pick">выбрать</span></td><td>Команда, которой адресована задача. Список команд — <a href="#teams">ниже</a>.</td></tr>
+              <tr><td class="n">6</td><td class="f">Срок исполнения</td><td><span class="tag pick">выбрать</span></td><td>Иконка календаря → дата → «Подтвердить».</td></tr>
+              <tr><td class="n">7</td><td class="f">Оценка срочности</td><td><span class="tag pick">выбрать</span></td><td>Шкала 1–5: от «можно в общую очередь» до «есть жёсткая бизнес-дата».</td></tr>
+              <tr><td class="n">8</td><td class="f">Ценность для бизнеса</td><td><span class="tag pick">выбрать</span></td><td>Шкала 1–5: от «косметический запрос» до «влияет на выручку / ключевой KPI».</td></tr>
+              <tr><td class="n">9</td><td class="f">Описание</td><td><span class="tag fill">заполнить</span></td><td>Бриф: что нужно, форматы, материалы, к чему привязан срок. Файлы — во «Вложение».</td></tr>
+              <tr class="skip"><td class="n">10</td><td class="f">Исполнитель</td><td><span class="tag skip">не трогать</span></td><td>«Автоматически»: задача уйдёт лиду команды.</td></tr>
+              <tr class="skip"><td class="n">11</td><td class="f">Технический проект</td><td><span class="tag skip">не трогать</span></td><td>Остаётся «Техническое развитие системы (812)».</td></tr>
+              <tr><td class="n">12</td><td class="f">Business</td><td><span class="tag pick">выбрать</span></td><td><b>Дизайн центр</b>.</td></tr>
+              <tr><td class="n">13</td><td class="f">Контрагент</td><td><span class="tag pick">выбрать</span></td><td>Ваше бизнес-направление. Начните вводить название в строку поиска.</td></tr>
+              <tr class="skip"><td class="n">14</td><td class="f">Оценки времени</td><td><span class="tag skip">не трогать</span></td><td>Заполняет лид команды.</td></tr>
+              <tr class="skip"><td class="n">15</td><td class="f">Объект РСБУ</td><td><span class="tag skip">не трогать</span></td><td>Значение должно быть <b>«НЕ ИТМ!!! (000000496)»</b>.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <section class="panel" id="access" aria-labelledby="access-h">
+    <div class="sec-head">
+      <span class="eyebrow">Перед стартом</span>
+      <h2 id="access-h">Вход и доступ</h2>
+      <p class="lead">Ваш аккаунт появляется в Jira только после первого входа. Пока вы не вошли, доступ к доске выдать нельзя.</p>
+    </div>
+    <div class="two">
+      <ol class="steps">
+        <li><span class="num">1</span><div><h3>Войдите в Jira</h3><p>Откройте <a href="https://track.magnit.ru/" target="_blank" rel="noopener">track.magnit.ru</a>, введите корпоративный логин в формате <code>ivanov_ii</code> и пароль, нажмите «Вход». При двухфакторной аутентификации следуйте подсказкам на экране.</p></div></li>
+        <li><span class="num">2</span><div><h3>Если не пускает</h3><p>Обратитесь в свою IT-службу или к руководителю: нужен доступ через СУМД (систему управления доступом), доменная группа <code>track_jira_user</code>, в запросе укажите проект <code>DCGASTRONOM</code>. Если не получается — напишите Богдану Миленковичу.</p></div></li>
+        <li><span class="num">3</span><div><h3>Попросите доступ к доске</h3><p>После первого входа напишите Виктору Беню или лиду нужной команды: ФИО и корпоративную почту. Без первого входа ваша почта в Jira не найдётся.</p></div></li>
+        <li><span class="num">4</span><div><h3>Сохраните ссылку на проект</h3><p><a href="https://track.magnit.ru/projects/DCGASTRONOM/issues/DCGASTRONOM-5?filter=allopenissues" target="_blank" rel="noopener">Design_Center_Gastronom</a> — отсюда создаются все задачи.</p></div></li>
+      </ol>
+      <figure class="shot"><div class="frame"><img src="img/login.jpg" alt="Экран входа в сервис: поля логина и пароля, кнопка «Вход»" loading="lazy"></div><figcaption>Экран входа. Логин — в формате <b>ivanov_ii</b> или <b>ii_ivanov</b>.</figcaption></figure>
+    </div>
+  </section>
+
+
+  <section class="panel" id="teams" aria-labelledby="teams-h">
+    <div class="sec-head">
+      <span class="eyebrow">Поле «Компоненты»</span>
+      <h2 id="teams-h">Какую команду выбрать</h2>
+      <p class="lead">Команда выбирается по носителю: где макет будет жить. Выбранная команда получает задачу на свою доску, а её лид назначает исполнителя.</p>
+    </div>
+    <div class="pick-rule">
+      <div><b>Печать и магазин</b><span>Плакаты, POS, навигация → Визуальные коммуникации. Наружная реклама, адаптации KV → Реклама. Каталоги, листовки → Каталоги.</span></div>
+      <div><b>Экран</b><span>Сайт, приложение, рассылки → Веб-дизайн. Анимация и видео → Моушн-дизайн.</span></div>
+      <div><b>Пограничный случай</b><span>Статичный баннер под акцию: для приложения — Веб-дизайн, для магазина — Визуальные коммуникации, нужна ещё и анимация — вторая, связанная задача в Моушн.</span></div>
+      <div><b>Не уверены</b><span>Поставьте в ближайшую по смыслу команду и напишите об этом в описании: лид переназначит. Или спросите Виктора Беня до создания.</span></div>
+    </div>
+    <div class="boards" id="boards"></div>
+    <div class="two">
+      <figure class="shot"><div class="frame"><img src="img/boards.jpg" alt="Список досок слева вверху экрана Jira" loading="lazy"></div><figcaption><b>Переключение между досками</b> — список слева вверху, под названием проекта.</figcaption></figure>
+      <figure class="shot"><div class="frame"><img src="img/filter.jpg" alt="Фильтр «Поставленные мной задачи» над доской" loading="lazy"></div><figcaption><b>Фильтр «Поставленные мной задачи»</b> над любой доской показывает только ваши задачи. А доска <a href="https://track.magnit.ru/secure/RapidBoard.jspa?rapidView=2683" target="_blank" rel="noopener">«Мои задачи»</a> собирает их со всех досок сразу.</figcaption></figure>
+    </div>
+    <p class="muted" style="font-size:14px">Периодика, пост-продакшн, моушн и каталоги входят в отдел каталогов и периодики (руководитель — Вячеслав Войченко).</p>
+  </section>
+
+  <section class="panel" id="statuses" aria-labelledby="st-h">
+    <div class="sec-head">
+      <span class="eyebrow">Статусы</span>
+      <h2 id="st-h">Где сейчас ваша задача</h2>
+      <p class="lead">Задача движется по колонкам доски слева направо. Оранжевым отмечены статусы, где ход за вами. Пунктиром — этапы, которые есть не на всех досках.</p>
+    </div>
+    <div class="flow">
+      <div class="st"><span class="pill">Бэклог</span><p><span class="who">Лид команды</span>Задача пришла. Лид назначает исполнителя и переводит её дальше.</p></div>
+      <div class="st you"><span class="pill">Требуется информация</span><p><span class="who">Ваш ход</span>Команде не хватает вводных. Ответьте в комментарии и отметьте исполнителя через @.</p></div>
+      <div class="st"><span class="pill">В работе</span><p><span class="who">Команда</span>Исполнитель делает задачу. Вопросы — в комментариях к задаче.</p></div>
+      <div class="st"><span class="pill">Внутреннее ревью</span><p><span class="who">Команда</span>Лид проверяет результат до того, как показать вам.</p></div>
+      <div class="st you"><span class="pill">На согласовании у заказчика</span><p><span class="who">Ваш ход</span>Исполнитель приложил материалы и отметил вас. Согласуйте или дайте правки — см. <a href="#review">«Правки»</a>.</p></div>
+      <div class="st opt"><span class="pill">Пре-пресс</span><p><span class="who">Команда</span>Подготовка к печати: периодика, пост-продакшн, каталоги, визуальные коммуникации, реклама.</p></div>
+      <div class="st opt"><span class="pill">Выгрузка в типографию</span><p><span class="who">Команда</span>Только на доске пост-продакшна.</p></div>
+      <div class="st"><span class="pill">Готово</span><p><span class="who">Финал</span>Работа принята. Ссылка на исходники — в комментарии исполнителя.</p></div>
+    </div>
+    <div class="two">
+      <figure class="shot"><div class="frame"><img src="img/approval.jpg" alt="Доска: задача в колонке «На согласовании у заказчика»" loading="lazy"></div><figcaption><b>Колонка «На согласовании у заказчика»</b>: исполнитель перенёс задачу сюда и отметил вас в комментарии.</figcaption></figure>
+      <figure class="shot"><div class="frame"><img src="img/status.jpg" alt="Смена статуса внутри задачи: клик по текущему статусу и выбор нового" loading="lazy"></div><figcaption><b>Сменить статус</b>: откройте задачу, нажмите на текущий статус (1) и выберите новый (2). Или перетащите карточку на доске.</figcaption></figure>
+    </div>
+  </section>
+
+  <section class="panel" id="review" aria-labelledby="rules-h">
+    <div class="sec-head">
+      <span class="eyebrow">Согласование</span>
+      <h2 id="rules-h">Правки и общение</h2>
+    </div>
+    <div class="rules">
+      <div class="rule hot"><h3>Всё, о чём договорились, — в задаче</h3><p>Для быстрых вопросов можно писать в мессенджер, но правки, комментарии и договорённости фиксируйте в Jira. Задачи из чатов и почты команда в работу не берёт.</p></div>
+      <div class="rule"><h3>Есть правки</h3><p>Напишите их одним комментарием, отметьте лида и исполнителя через @ и верните задачу в «В работе».</p></div>
+      <div class="rule"><h3>«В работе» или «Бэклог»?</h3><p><b>«В работе»</b> — правки внутри задачи: текст, цвет, замена фото, перестановка элементов. <b>«Бэклог»</b> — задача изменилась: новые носители, другая концепция, новые вводные. Лид заново оценит срок. Сомневаетесь — спросите лида в комментарии.</p></div>
+      <div class="rule"><h3>Всё согласовано</h3><p>Напишите об этом в комментарии. Для экранных задач переведите задачу в «Готово». Для печатных команда сама проведёт пре-пресс и закроет задачу. Исполнитель оставит ссылку на исходники.</p></div>
+      <div class="rule"><h3>Нужна другая команда</h3><p>Например, к макету нужна анимация. Откройте задачу → «Ещё» → «Создать связанную задачу» и выберите в «Компонентах» нужную команду.</p></div>
+      <div class="rule"><h3>Связанная задача: что копируется</h3><p>Описание и поля копируются, а <b>вложения и комментарии — нет</b>. Ссылку на финальный макет продублируйте в описании новой задачи.</p></div>
+      <div class="rule"><h3>Разбить задачу на части</h3><p>Откройте задачу → «Ещё» → «Создать подзадачу». Например, отдельная подзадача на копирайт внутри задачи на баннер.</p></div>
+    </div>
+    <div class="shots">
+      <figure class="shot"><div class="frame"><img src="img/comment.jpg" alt="Поле «Добавить комментарий» внизу задачи" loading="lazy"></div><figcaption><b>Комментарий</b> — поле внизу задачи. Отметьте человека через @, прикрепите файл или ссылку, нажмите «Добавить».</figcaption></figure>
+      <figure class="shot"><div class="frame"><img src="img/linked.jpg" alt="Меню «Ещё» с пунктом «Создать связанную задачу»" loading="lazy"></div><figcaption><b>Связанная задача</b>: «Ещё» → «Создать связанную задачу».</figcaption></figure>
+      <figure class="shot"><div class="frame"><img src="img/subtask.jpg" alt="Меню «Ещё» с пунктом «Создать подзадачу»" loading="lazy"></div><figcaption><b>Подзадача</b>: «Ещё» (1) → «Создать подзадачу» (2).</figcaption></figure>
+    </div>
+  </section>
+
+  <section class="panel" id="proof" aria-labelledby="proof-h">
+    <div class="sec-head">
+      <span class="eyebrow">Корректура</span>
+      <h2 id="proof-h">Как поставить задачу корректорам</h2>
+      <p class="lead">Задачи корректорам идут через Jira, почта correctors_DC@magnit.ru больше не используется. Ставит задачу заказчик, а не дизайнер.</p>
+    </div>
+    <div class="two">
+      <ol class="steps">
+        <li><span class="num">1</span><div><h3>Заберите макет у дизайнера</h3><p>Ссылка на финальный макет придёт в комментарии к вашей задаче.</p></div></li>
+        <li><span class="num">2</span><div><h3>Создайте отдельную задачу</h3><p>Удобнее через «Ещё» → «Создать связанную задачу». В «Компонентах» выберите <b>«Корректоры»</b>. Ссылку на макет вставьте в описание: комментарии и вложения в новую задачу не переносятся.</p></div></li>
+        <li><span class="num">3</span><div><h3>Добавьте дизайнера в наблюдатели</h3><p>Справа в задаче нажмите на число наблюдателей и найдите дизайнера. Так он увидит правки корректора без вашего пересказа.</p></div></li>
+        <li><span class="num">4</span><div><h3>Получите правки</h3><p>Корректор загрузит файл с правками в задачу, отметит вас и переведёт её в «Готово».</p></div></li>
+        <li><span class="num">5</span><div><h3>Передайте правки дизайнеру</h3><p>В своей задаче дизайнеру напишите комментарий: отметьте его через @ и приложите файл корректора. Дизайнер внесёт правки и приложит обновлённый макет туда же.</p></div></li>
+        <li><span class="num">6</span><div><h3>Нужна ещё одна вычитка</h3><p>Корректор проверяет обновлённую версию, поэтому вложите её в задачу корректору. Затем: верните задачу в «Бэклог» → отметьте корректора через @ → переведите в «В работе» → назначьте его исполнителем. Так задача снова попадёт корректору в очередь: после «Готово» исполнителем числитесь вы.</p></div></li>
+      </ol>
+      <div style="display:flex;flex-direction:column;gap:20px;min-width:0">
+        <figure class="shot"><div class="frame"><img src="img/corr-comp.jpg" alt="Форма создания задачи с открытым списком компонентов, выделен пункт «Корректоры»" loading="lazy"></div><figcaption><b>В поле «Компоненты» выберите «Корректоры».</b></figcaption></figure>
+        <figure class="shot"><div class="frame"><img src="img/watchers.jpg" alt="Блок «Люди» справа в задаче: добавление наблюдателя" loading="lazy"></div><figcaption><b>Наблюдатели</b> — справа в задаче, блок «Люди». Нажмите на число и начните вводить имя.</figcaption></figure>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel" id="notify" aria-labelledby="notify-h">
+    <div class="sec-head">
+      <span class="eyebrow">Уведомления</span>
+      <h2 id="notify-h">Как получать меньше писем от Jira</h2>
+      <p class="lead">Автор задачи получает письмо о каждом действии в ней: файл, комментарий, статус, дата. Полностью отключить письма самостоятельно нельзя, но поток можно сократить в несколько раз.</p>
+    </div>
+    <ol class="steps">
+      <li><span class="num">1</span><div><h3>Получать уведомления Jira в Таг</h3><p>Подключите канал по <a href="https://it-portal.corp.tander.ru/pages/viewpage.action?pageId=2082028732" target="_blank" rel="noopener">инструкции</a>: события по задачам будут приходить туда. Это не отключает почту — её настройки ниже.</p></div></li>
+      <li><span class="num">2</span><div><h3>Не получать письма о своих действиях</h3><p>Аватар справа вверху → «Профиль» → в блоке «Настройки» нажмите «Изменить» → «Мои изменения»: <b>«Не уведомлять меня»</b> → «Обновить».</p></div></li>
+      <li><span class="num">3</span><div><h3>Отключить автоподписку</h3><p>Там же «Автонаблюдение» → <b>«Отключено»</b>. Jira перестанет подписывать вас на каждую задачу, где вы оставили комментарий.</p></div></li>
+      <li><span class="num">4</span><div><h3>Отписаться от лишней задачи</h3><p>Откройте задачу → справа в блоке «Люди» нажмите «Прекратить наблюдение».</p></div></li>
+      <li><span class="num">5</span><div><h3>Папка для писем Jira в Outlook</h3><p>Правой кнопкой на письмо от Jira → «Правила» → «Всегда перемещать сообщения от…» → папка «Jira». Письма останутся под рукой, но не будут засорять входящие.</p></div></li>
+    </ol>
+    <div class="rule"><h3>Обратная ситуация: уведомления не приходят</h3><p>Проверьте по порядку: вы в наблюдателях задачи (блок «Люди» справа); письма Jira не уехали в папку по правилу Outlook или в спам; в профиле Jira не стоит «Не уведомлять меня» на нужных событиях. Если всё в порядке, а писем нет — напишите Богдану Миленковичу со ссылкой на задачу.</p></div>
+    <p class="muted" style="font-size:14px">Названия пунктов в профиле могут немного отличаться в зависимости от языка интерфейса. Системное сокращение уведомлений для всего проекта обсуждается с администраторами Jira.</p>
+  </section>
+
+  <section class="panel" id="links" aria-labelledby="links-h">
+    <div class="sec-head">
+      <span class="eyebrow">Полезное</span>
+      <h2 id="links-h">Ссылки</h2>
+    </div>
+    <div class="links">
+      <a href="https://track.magnit.ru/projects/DCGASTRONOM/issues/DCGASTRONOM-5?filter=allopenissues" target="_blank" rel="noopener"><b>Проект в Jira</b><span>Design_Center_Gastronom</span></a>
+      <a href="https://track.magnit.ru/secure/RapidBoard.jspa?rapidView=2683" target="_blank" rel="noopener"><b>Доска «Мои задачи»</b><span>Все ваши задачи со всех досок</span></a>
+      <a href="https://docs.google.com/document/d/1n5s8lzywVJta9b4oHxcK2fUnMIljMVLi9UDQgGC-nyU/edit?usp=sharing" target="_blank" rel="noopener"><b>Полная инструкция</b><span>Документ со скриншотами</span></a>
+      <a href="https://help.corp.tander.ru/dwp/app/#/srm/profile/SRGv00ars00200SH438ESG3TMD3CRU/srm" target="_blank" rel="noopener"><b>Портал Help</b><span>Заявка, если Jira не работает</span></a>
+      <a href="https://it-portal.corp.tander.ru/pages/viewpage.action?pageId=2082028732" target="_blank" rel="noopener"><b>Уведомления в Таг</b><span>Задачи из Jira в канал вместо почты</span></a>
+      <a href="https://it-portal.corp.tander.ru/pages/viewpage.action?pageId=1639197191" target="_blank" rel="noopener"><b>Инструкция по Jira от IT</b><span>Через VPN FortiClient</span></a>
+      <a href="https://magnum.magnit.ru/view_doc.html?mode=course&amp;object_id=7230911252836612543" target="_blank" rel="noopener"><b>Курс «Jira для стрима»</b><span>Магнум</span></a>
+      <a href="https://magnum.magnit.ru/view_doc.html?mode=course&amp;object_id=7230916597021800685" target="_blank" rel="noopener"><b>Курс «Jira для команд»</b><span>Магнум</span></a>
+      <a href="https://magnum.magnit.ru/view_doc.html?mode=course&amp;object_id=7190538371290611600" target="_blank" rel="noopener"><b>Курс «Основы Kanban»</b><span>Магнум</span></a>
+    </div>
+  </section>
+
+  <section class="panel" id="faq-sec" aria-labelledby="faq-h">
+    <div class="sec-head">
+      <span class="eyebrow">FAQ</span>
+      <h2 id="faq-h">Частые вопросы</h2>
+      <p class="lead">Собраны из переписки с заказчиками. Не нашли свой — напишите, добавим.</p>
+    </div>
+    <div class="faq" id="faqall"></div>
+  </section>
+
+
+  <section class="contact" id="contact" aria-labelledby="c-h">
+    <h2 id="c-h">Не нашли ответ?</h2>
+    <p>Если вопрос про конкретную задачу, приложите ссылку на неё.</p>
+    <div class="people">
+      <div class="person">
+        <span class="role">Процесс, бриф, статусы</span>
+        <span class="name">Виктор Бень</span>
+        <span class="about">Координатор студии. Подскажет, какую команду выбрать, и покажет на примере.</span>
+        <div class="row"><span class="lbl-c">Почта</span><span class="handle">ben_vg@magnit.ru</span><button class="ic" type="button" data-copy="ben_vg@magnit.ru" aria-label="Скопировать почту"><svg viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M15 9V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h3"/></svg></button></div>
+        <div class="row"><span class="lbl-c">Таг</span><span class="handle">@ben_vg</span><button class="ic" type="button" data-copy="@ben_vg" aria-label="Скопировать ник в Таге"><svg viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M15 9V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h3"/></svg></button></div>
+      </div>
+      <div class="person">
+        <span class="role">Доступ и технические сбои</span>
+        <span class="name">Богдан Миленкович</span>
+        <span class="about">Ведущий специалист сопровождения. Нет доступа, не работает кнопка, ошибка в Jira.</span>
+        <div class="row"><span class="lbl-c">Почта</span><span class="handle">milenkovich_b@magnit.ru</span><button class="ic" type="button" data-copy="milenkovich_b@magnit.ru" aria-label="Скопировать почту"><svg viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M15 9V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h3"/></svg></button></div>
+        <div class="row"><span class="lbl-c">Таг</span><span class="handle">@milenkovich_b</span><button class="ic" type="button" data-copy="@milenkovich_b" aria-label="Скопировать ник в Таге"><svg viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M15 9V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h3"/></svg></button></div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="foot">
+    <div class="foot-credit">
+      <span class="foot-title">Справочник сделала студия дизайна «Гастроном Медиа»</span>
+      <span>Такой же справочник для своего направления, брендинг, кампания или спецпроект — напишите руководителю студии Александру Кроткову: <span class="handle-l">krotkov_av@magnit.ru</span>. Вопросы по текущим задачам в Jira — Виктору Беню.</span>
+    </div>
+    <div class="foot-meta">Владелец справочника: Виктор Бень. Сверено с Jira 13.10.2026. Нашли ошибку или устаревшее — <span class="handle-l">ben_vg@magnit.ru</span></div>
+  </footer>
+</div>
+
+<dialog class="lb" id="lb"><img id="lbimg" src="" alt=""><div class="cap" id="lbcap"></div><button type="button" id="lbclose" aria-label="Закрыть">✕</button></dialog>
+
+<script>
+const J = 'https://track.magnit.ru/';
+const PROJ = J + 'projects/DCGASTRONOM/issues/DCGASTRONOM-5?filter=allopenissues';
+const BOARDS = [
+  ["Отдел визуальных коммуникаций","Андрей Шумов",2561,"печать: с пре-прессом","POS-материалы, плакаты и оформление в магазинах, навигация"],
+  ["Сектор рекламы","Вероника Маевская",2566,"печать: с пре-прессом","рекламные макеты, наружная реклама, адаптации KV на носители"],
+  ["Сектор веб-дизайна","Наталия Анферова",2562,"без пре-пресса","баннеры для сайта и приложения, лендинги, email-рассылки"],
+  ["Сектор моушн-дизайна","Виталий Почтарёв",2565,"без пре-пресса","анимированные баннеры, ролики для соцсетей и экранов"],
+  ["Сектор дизайна каталогов","Карина Скрынник",2563,"печать: с пре-прессом","каталоги и буклеты акций, листовки"],
+  ["Сектор дизайна периодики","Александр Елкин",2560,"печать: с пре-прессом","журналы и регулярные издания"],
+  ["Сектор пост-продакшн","Антон Кувайцев",2587,"пре-пресс и выгрузка в типографию","подготовка макетов к печати, цветокоррекция, передача в типографию"],
+  ["Корректоры","Екатерина Кучеренко",2611,"Бэклог → В работе → Готово","вычитка текстов на готовых макетах"],
+];
+document.getElementById('boards').innerHTML = BOARDS.map(([n,l,id,r,ex]) =>
+  `<div class="board"><h3>${n}</h3><span class="who">Лид: ${l}</span><span class="ex">Например: ${ex}</span><span class="route">${r}</span><a href="${J}secure/RapidBoard.jspa?rapidView=${id}&projectKey=DCGASTRONOM" target="_blank" rel="noopener">Открыть доску →</a></div>`).join('');
+
+/* ---- lightbox ---- */
+const lb = document.getElementById('lb'), lbimg = document.getElementById('lbimg'), lbcap = document.getElementById('lbcap');
+let lbReturn = null;
+function openLb(src, cap, returnTo){ lbimg.src = src; lbimg.alt = cap || ''; lbcap.textContent = cap || ''; lbReturn = returnTo || null; if (lb.showModal) lb.showModal(); }
+lb.addEventListener('close', () => { if (lbReturn && lbReturn.focus) lbReturn.focus(); });
+document.querySelectorAll('figure.shot .frame').forEach(f => {
+  const img = f.querySelector('img'), cap = f.parentElement.querySelector('figcaption');
+  f.setAttribute('role','button'); f.tabIndex = 0; f.setAttribute('aria-label', 'Увеличить скриншот: ' + img.alt);
+  const open = () => openLb(img.src, cap ? cap.innerText : img.alt, f);
+  f.addEventListener('click', open);
+  f.addEventListener('keydown', e => { if (e.key==='Enter'||e.key===' '){ e.preventDefault(); open(); } });
+});
+document.getElementById('lbclose').addEventListener('click', () => lb.close());
+lb.addEventListener('click', e => { if (e.target === lb) lb.close(); });
+
+/* ---- тренажёр формы ---- */
+const TEAM_OPTS = BOARDS.map(b => `<option value="${b[0]}">${b[0]}</option>`).join('');
+const SIM = [
+  {intro:1, k:"fill", img:"create", t:"Нажмите «Создать»", h:"Кнопка «Создать» — в верхней панели Jira, на любой странице проекта. Откроется форма, которую вы видите слева."},
+  {l:"Проект", k:"pick", img:"f-project", c:`<span class="jin dd">Design_Center_Gastronom</span>`, t:"Проверьте проект", h:"Должен быть выбран <b>Design_Center_Gastronom</b> (1). Если стоит другой, выберите его из списка."},
+  {l:"Тип задачи", k:"pick", img:"f-project", c:`<span class="jin dd">Задача</span>`, t:"Тип — «Задача»", h:"Выберите <b>«Задача»</b> (2). Эпики и другие типы заказчикам не нужны."},
+  {l:"Тема", k:"fill", r:1, img:"f-project", c:`<span class="jin ph">Баннер в приложение — акция «Неделя кофе»</span>`, t:"Назовите задачу", h:"Коротко и по делу, что нужно сделать (3). По теме задачу будут искать и вы, и команда."},
+  {l:"Автор", k:"skip", img:"f-project", c:`<span class="jin">Вы</span>`, t:"Автор заполнится сам", h:"Ничего делать не нужно: автором станете вы. Автор получает уведомления обо всём, что происходит в задаче."},
+  {l:"Компоненты", k:"pick", img:"f-comp", c:`<select class="jsel" id="jcomp" aria-label="Компоненты"><option value="">Выберите команду…</option>${TEAM_OPTS}</select>`, t:"Выберите команду", h:"Самое важное поле: оно решает, на чью доску попадёт задача. Попробуйте выбрать команду в списке слева."},
+  {l:"Срок исполнения", k:"pick", img:"f-date", c:`<span class="jin ph">д/МММ/гг</span><span aria-hidden="true">📅</span>`, t:"Укажите срок", h:"Иконка календаря (1) → дата (2) → «Подтвердить» (3). Ставьте дату, когда материал нужен вам, а в описании напишите, к чему она привязана."},
+  {l:"Оценка срочности", k:"pick", r:1, img:"f-prio", c:`<span class="jin dd ph">Не заполнено</span>`, t:"Срочность по шкале 1–5", h:"От «1 — можно в общую очередь» до «5 — есть жёсткая бизнес-дата». Вместе с ценностью для бизнеса складывается в коэффициент приоритизации."},
+  {l:"Ценность для бизнеса", k:"pick", r:1, img:"f-prio", c:`<span class="jin dd ph">Не заполнено</span>`, t:"Ценность по шкале 1–5", h:"От «1 — косметический запрос» до «5 — влияет на выручку / ключевой KPI». Оценивайте честно: если у всех задач максимум, очередь перестаёт работать."},
+  {l:"Описание", k:"fill", img:"f-desc", c:`<span class="jtool" aria-hidden="true"><b>B</b><i>I</i><u>U</u><span>•</span><span>🔗</span><span>📎</span></span><span class="jin area ph">Что нужно и зачем, форматы, срок, ссылки на материалы…</span>`, t:"Напишите бриф", h:"Что нужно и зачем, форматы и размеры, к чему привязан срок, ссылки на KV (ключевой визуал), тексты и фото. Шаблон брифа — ниже под формой. Файлы перетащите в поле «Вложение» под описанием."},
+  {l:"Исполнитель", k:"skip", img:"f-assignee", c:`<span class="jin dd">Автоматически</span>`, t:"Исполнителя не меняйте", h:"Оставьте <b>«Автоматически»</b>: задача уйдёт лиду выбранной команды, он сам назначит исполнителя."},
+  {l:"Технический проект", k:"skip", img:"f-tech", c:`<span class="jin dd">Техническое развитие системы (812)</span>`, t:"Технический проект", h:"Не трогайте. Остаётся «Техническое развитие системы (812)»."},
+  {l:"Business", k:"pick", r:1, img:"f-business", c:`<span class="jin dd ph">Не заполнено</span>`, t:"Business — «Дизайн центр»", h:"Выберите из списка <b>«Дизайн центр»</b>."},
+  {l:"Контрагент", k:"pick", r:1, img:"f-contr", c:`<span class="jin ph">🔍 Начните вводить название…</span>`, t:"Контрагент — ваше направление", h:"Укажите своё бизнес-направление. В списке больше 100 значений, поэтому начните вводить название. Не нашли — напишите лиду команды."},
+  {l:"Оценка времени", k:"skip", img:"f-time", c:`<span class="jin ph">Первоначальная оценка</span><span class="jin ph">Оценка остатка</span>`, t:"Оценки времени — пусто", h:"Оставьте пустыми. Их заполняет лид команды, когда распределяет задачу."},
+  {l:"Объект РСБУ", k:"skip", r:1, img:"f-rsbu", c:`<span class="jin dd">НЕ ИТМ!!! (000000496)</span>`, t:"Объект РСБУ — не трогать", h:"Системное поле. Просто проверьте, что значение — <b>«НЕ ИТМ!!! (000000496)»</b>."},
+  {btn:1, k:"fill", img:"backlog", t:"Нажмите «Создать»", h:""},
+];
+const KLABEL = {fill:"заполнить", pick:"выбрать", skip:"не трогать"};
+const jbody = document.getElementById('jbody'), jcreate = document.getElementById('jcreate');
+jbody.innerHTML = SIM.map((s,i) => s.l ?
+  `<div class="jf ${s.r?'req':''} ${s.k==='skip'?'skip':''}" data-step="${i}" tabindex="0" role="button" aria-label="${s.l}"><span class="jl">${s.l}</span><span class="jctl">${s.c}</span></div>` : '').join('');
+let cur = 0, done = false;
+const onlyMine = document.getElementById('onlymine');
+const visible = () => SIM.map((s,i)=>i).filter(i => !(onlyMine.checked && SIM[i].k==='skip'));
+const nextIdx = (from, dir) => { const v = visible(); if (!v.includes(from)) return dir>0 ? (v.find(i=>i>from) ?? v[v.length-1]) : ([...v].reverse().find(i=>i<from) ?? v[0]); const p = v.indexOf(from)+dir; return v[Math.max(0, Math.min(v.length-1, p))]; };
+const comp = () => document.getElementById('jcomp').value;
+function lead(){ const b = BOARDS.find(x=>x[0]===comp()); return b ? b[1] : null; }
+const himg = document.getElementById('himg');
+function setImg(name, alt){ himg.src = `img/${name}.jpg`; himg.alt = alt; }
+function show(i, scroll){
+  cur = Math.max(0, Math.min(SIM.length-1, i)); done = false;
+  const s = SIM[cur], v = visible(), pos = v.indexOf(cur);
+  document.querySelectorAll('.jf').forEach(el => el.classList.toggle('on', +el.dataset.step===cur));
+  jcreate.classList.toggle('on', !!s.btn);
+  document.getElementById('hno').textContent = pos >= 0 ? `Шаг ${pos+1} из ${v.length}` : 'Автоматическое поле';
+  const tag = document.getElementById('htag');
+  tag.className = 'tag ' + s.k; tag.textContent = s.btn ? 'финал' : (s.intro ? 'старт' : KLABEL[s.k]);
+  document.getElementById('hbar').style.width = ((pos >= 0 ? pos+1 : 0)/v.length*100)+'%';
+  document.getElementById('htitle').textContent = s.t;
+  let h = s.h;
+  if (s.l==='Компоненты' && comp()) h = `Выбрано: <b>${comp()}</b>. Задача уйдёт лиду — <b>${lead()}</b>.`;
+  if (s.btn) h = `Задача появится в бэклоге ${comp() ? `доски «${comp()}» и уйдёт лиду — ${lead()}` : 'выбранной команды'}. На скриншоте — свежая задача в колонке «Бэклог».`;
+  document.getElementById('htext').innerHTML = h;
+  setImg(s.img, s.t);
+  document.getElementById('hprev').disabled = cur===0;
+  document.getElementById('hnext').textContent = s.btn ? 'Готово' : 'Далее';
+  if (scroll){
+    const el = s.btn ? jcreate : jbody.querySelector(`[data-step="${cur}"]`);
+    if (!el) return;
+    if (window.matchMedia('(max-width:760px)').matches) el.scrollIntoView({block:'center', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'});
+    else if (jbody.contains(el)) jbody.scrollTo({top: el.offsetTop - jbody.offsetTop - 40, behavior:'smooth'});
+  }
+}
+function finish(){
+  done = true;
+  document.querySelectorAll('.jf').forEach(el => el.classList.remove('on'));
+  jcreate.classList.remove('on');
+  document.getElementById('hno').textContent = 'Пройдено';
+  const tag = document.getElementById('htag'); tag.className='tag fill'; tag.textContent='готово';
+  document.getElementById('hbar').style.width = '100%';
+  document.getElementById('htitle').textContent = 'Последний штрих: наблюдатели';
+  document.getElementById('htext').innerHTML = 'Откройте созданную задачу и добавьте коллег в наблюдатели: справа в блоке «Люди» нажмите на число наблюдателей и начните вводить имя. Дальше задача движется по <a href="#statuses">статусам</a>.';
+  setImg('watchers', 'Добавление наблюдателей в задаче');
+  document.getElementById('hprev').disabled = false;
+  document.getElementById('hnext').textContent = 'Пройти заново';
+}
+jbody.addEventListener('click', e => { const f = e.target.closest('.jf'); if (f) show(+f.dataset.step, false); });
+jbody.addEventListener('keydown', e => { const f = e.target.closest('.jf'); if (f && (e.key==='Enter'||e.key===' ') && e.target.tagName!=='SELECT'){ e.preventDefault(); show(+f.dataset.step,false);} });
+document.getElementById('jcomp').addEventListener('change', () => { if (SIM[cur].l==='Компоненты' && !done) show(cur,false); });
+jcreate.addEventListener('click', () => show(SIM.length-1, false));
+document.getElementById('hnext').addEventListener('click', () => {
+  if (done) { show(0, true); return; }
+  if (cur === SIM.length-1) finish(); else show(nextIdx(cur, 1), true);
+});
+document.getElementById('hprev').addEventListener('click', () => { if (done) show(SIM.length-1,true); else show(nextIdx(cur, -1), true); });
+onlyMine.addEventListener('change', () => { document.querySelectorAll('.jf.skip').forEach(el => el.classList.toggle('dim', onlyMine.checked)); if (!done) show(cur,false); });
+document.querySelectorAll('.jf.skip').forEach(el => el.classList.add('dim'));
+const hshot = document.getElementById('hshot');
+hshot.addEventListener('click', () => openLb(himg.src, document.getElementById('htitle').textContent, hshot));
+hshot.addEventListener('keydown', e => { if (e.key==='Enter'||e.key===' '){ e.preventDefault(); hshot.click(); } });
+show(0, false);
+
+/* parallax логотипа */
+const logoWrap = document.getElementById('logo'), heroEl = document.querySelector('.hero');
+const noMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+if (!noMotion && logoWrap){
+  const setP = (x,y) => { logoWrap.style.setProperty('--px', x.toFixed(1)+'px'); logoWrap.style.setProperty('--py', y.toFixed(1)+'px'); };
+  let mx = 0, my = 0, sy = 0;
+  heroEl.addEventListener('pointermove', e => { if (e.pointerType === 'touch') return; const r = heroEl.getBoundingClientRect(); mx = ((e.clientX - r.left)/r.width - .5) * 14; my = ((e.clientY - r.top)/r.height - .5) * 10; setP(mx, my + sy); });
+  heroEl.addEventListener('pointerleave', () => { mx = 0; my = 0; setP(0, sy); });
+  const onScroll = () => { sy = Math.min(40, window.scrollY * 0.12); setP(mx, my + sy); };
+  window.addEventListener('scroll', onScroll, {passive:true});
+}
+
+/* brief copy + theme */
+const copyText = (txt, b) => {
+  const label = b.textContent, ok = () => { b.textContent = 'Скопировано'; setTimeout(() => b.textContent = label, 1600); };
+  try { navigator.clipboard.writeText(txt).then(ok).catch(() => { b.textContent = 'Выделите и скопируйте'; }); } catch(_) { b.textContent = 'Выделите и скопируйте'; }
+};
+document.getElementById('copybrief').addEventListener('click', e => copyText(document.getElementById('brieftpl').textContent, e.currentTarget));
+const root = document.documentElement, themeBtn = document.getElementById('theme');
+try { const t = localStorage.getItem('theme'); if (t==='light'||t==='dark') root.setAttribute('data-theme', t); } catch(_){}
+themeBtn.addEventListener('click', () => {
+  const dark = root.getAttribute('data-theme')==='dark' || (!root.getAttribute('data-theme') && matchMedia('(prefers-color-scheme: dark)').matches);
+  const next = dark ? 'light' : 'dark';
+  root.setAttribute('data-theme', next);
+  try { localStorage.setItem('theme', next); } catch(_){}
+});
+
+/* ---- FAQ ---- */
+const A = (h,t) => `<a href="${h}" target="_blank" rel="noopener">${t}</a>`;
+const FAQ = [
+  ["Где ставить задачу?", `Только в Jira, в проекте ${A(PROJ,"Design_Center_Gastronom")}. Задачи из чатов и почты команды в работу не берут.`, "задача где поставить проект jira заявка чат почта"],
+  ["Не могу войти в Jira или нет доступа.", `Вход — ${A(J,"track.magnit.ru")} под корпоративным логином. Если не пускает, обратитесь в свою IT-службу или к руководителю за доступом через СУМД (система управления доступом): группа <code>track_jira_user</code>, проект <code>DCGASTRONOM</code>. Не помогло — напишите Богдану Миленковичу (Таг: @milenkovich_b).`, "доступ войти логин пароль сумд авторизация вход"],
+  ["Вошёл, но не вижу доску нужной команды.", `Напишите Виктору Беню (Таг: @ben_vg) или лиду команды: ФИО и корпоративную почту. Важно: сначала хотя бы раз войти на track.magnit.ru, иначе ваша почта в Jira не найдётся и доступ выдать не получится.`, "доступ доска не вижу команда почта не находится"],
+  ["Какую команду выбрать?", `По носителю. Печать и магазин: плакаты, POS, навигация — Визуальные коммуникации; наружная реклама и адаптации KV — Реклама; каталоги и листовки — Каталоги. Экран: сайт, приложение, рассылки — Веб-дизайн; анимация и видео — Моушн. Примеры и пограничные случаи — в разделе ${'<a href="#teams">«Какую команду выбрать»</a>'}. Если ошиблись, лид переназначит: напишите об этом в описании.`, "команда компоненты выбрать доска сектор отдел кто отвечает баннер носитель"],
+  ["Выбрал не ту команду. Что делать?", `Откройте задачу → «Редактировать» → поле «Компоненты» → выберите нужную команду. Если задача уже в работе, напишите комментарий и отметьте лида через @: он переназначит.`, "не ту команду ошибся компоненты поменять переназначить"],
+  ["Какие поля обязательно заполнить?", `Тема, Компоненты, Срок исполнения, Оценка срочности, Ценность для бизнеса, Описание, Business («Дизайн центр») и Контрагент. Тип задачи — «Задача». Пошагово — в ${'<a href="#create">тренажёре формы</a>'}.`, "поля заполнить обязательные форма создать"],
+  ["Какие поля не трогать?", `Автор, Исполнитель («Автоматически»), Технический проект, оценки времени и Объект РСБУ — в нём должно быть «НЕ ИТМ!!! (000000496)».`, "поля не трогать исполнитель рсбу оценка времени технический проект"],
+  ["Что значат срочность и ценность для бизнеса?", `Две шкалы 1–5. Срочность: от «можно в общую очередь» до «есть жёсткая бизнес-дата». Ценность: от «косметический запрос» до «влияет на выручку / ключевой KPI». Их сумма — коэффициент приоритизации, по которому лид строит очередь.`, "срочность ценность приоритет шкала коэффициент приоритизации"],
+  ["Не нахожу своё направление в поле «Контрагент».", `Начните вводить название в строку поиска: в списке больше 100 значений. Если направления нет, напишите лиду команды, которой ставите задачу.`, "контрагент направление бизнес нет в списке поля"],
+  ["Кто будет исполнителем моей задачи?", `Задача автоматически уходит лиду выбранной команды. Он назначит исполнителя и переведёт задачу в работу.`, "исполнитель кто лид назначит"],
+  ["Задача зависла. Что проверить и кому писать?", `1. Статус: «Требуется информация» — ход за вами, ответьте в комментарии. 2. «Бэклог» дольше обычного — напишите комментарий и отметьте лида команды через @. 3. Лид не отвечает (отпуск, больничный) — напишите Виктору Беню: имя лида и ссылку на задачу, он передаст её сотруднику, который замещает лида. 4. Всегда прикладывайте ссылку на задачу.`, "зависла висит не двигается не берут отпуск больничный бэклог лид не распределяет долго ждать"],
+  ["У меня срочная задача.", `Поставьте «5» в «Оценке срочности», напишите в описании, к чему привязан срок, и отметьте лида команды через @ в комментарии.`, "срочно срочная приоритет горит оценка срочности дедлайн"],
+  ["Как указать срок (дедлайн)?", `Поле «Срок исполнения»: иконка календаря → дата → «Подтвердить». Ставьте дату, когда материал нужен вам, и напишите в описании, к чему она привязана: выгрузка, печать, запуск. Срочность отдельно задаётся полем «Оценка срочности».`, "срок дедлайн дата когда срок исполнения календарь"],
+  ["Изменился срок или объём задачи.", `Напишите комментарий в задаче и отметьте лида через @: что изменилось и новая дата. Новые носители или другая концепция — верните задачу в «Бэклог», лид заново оценит срок. Перенос даты — обновите «Срок исполнения» в задаче.`, "изменился срок объём перенести дату новые вводные дополнить"],
+  ["Задача больше не нужна.", `Напишите в комментарии, что задача отменяется, и отметьте лида через @. Он закроет её. Не удаляйте задачу сами: история нужна для учёта.`, "не нужна отменить удалить закрыть отмена"],
+  ["Создал задачу, но не вижу её на доске.", `1. Откройте доску ${A(J+"secure/RapidBoard.jspa?rapidView=2683","«Мои задачи»")} — она собирает задачи со всех досок. 2. На доске команды включите фильтр «Поставленные мной задачи». 3. Проверьте, какая команда стоит в «Компонентах»: задача лежит на её доске. 4. Не нашли — напишите Виктору Беню.`, "не вижу задачу пропала где задача создал не отображается"],
+  ["Как дать правки?", `Комментарием в задаче. Отметьте лида и исполнителя через @ и верните задачу в «В работе». Если правки большие и потребуют много времени — в «Бэклог».`, "правки комментарий согласование фидбэк вернуть"],
+  ["Задача в статусе «Требуется информация».", `Команде не хватает вводных для работы. Ответьте в комментарии и отметьте исполнителя через @.`, "требуется информация статус бриф неполный вводные"],
+  ["Согласовал результат. Что дальше?", `Напишите об этом в комментарии и переведите задачу в «Готово». Исполнитель оставит в комментарии ссылку на исходники.`, "согласовал готово утвердил дальше исходники файлы"],
+  ["Где взять готовые файлы?", `В задаче: исполнитель прикладывает результат вложением или ссылкой на папку, а после согласования — ссылку на исходник в комментарии.`, "файлы исходники где скачать результат"],
+  ["К макету нужна анимация или работа другой команды.", `Откройте задачу → «Ещё» → «Создать связанную задачу», в «Компонентах» выберите нужную команду. Описание скопируется, а вложения и комментарии — нет: ссылку на макет вставьте в описание.`, "связанная задача анимация моушн другая команда"],
+  ["Что копируется в связанную задачу?", `Описание и поля формы. Вложения и комментарии (в том числе ссылки на макеты от дизайнера) не копируются — продублируйте их в описании новой задачи.`, "связанная задача копируется вложения комментарии ссылки"],
+  ["Как разбить задачу на части?", `Откройте задачу → «Ещё» → «Создать подзадачу». Дальше заполните форму как обычно.`, "подзадача разбить части"],
+  ["Как поставить задачу корректору?", `Ставит заказчик, а не дизайнер. Заберите макет у дизайнера и создайте отдельную задачу с компонентом «Корректоры», ссылку на макет — в описание. Почта correctors_DC@magnit.ru больше не используется.`, "корректор корректура вычитка корректоры"],
+  ["Как дизайнеру видеть правки корректора?", `Добавьте дизайнера в наблюдатели задачи корректору: справа в задаче нажмите на число наблюдателей и введите имя.`, "корректор дизайнер наблюдатели правки видеть"],
+  ["Нужна повторная вычитка.", `Верните задачу в «Бэклог», отметьте корректора через @, переведите в «В работе» и назначьте его исполнителем.`, "корректор повторная вычитка итерация корректура"],
+  ["Как найти все свои задачи?", `Доска ${A(J+"secure/RapidBoard.jspa?rapidView=2683","«Мои задачи»")} собирает задачи, где вы автор или исполнитель, со всех досок и проектов. На отдельной доске — фильтр «Поставленные мной задачи».`, "мои задачи найти фильтр поставленные мной все доски"],
+  ["Как выглядит полный бриф?", `Задача, зачем, аудитория, ключевое сообщение, что сдаём с размерами, материалы, обязательные элементы, срок и кто согласует. Шаблон с кнопкой «Скопировать» и пример на баннер — в ${'<a href="#brief">блоке «Как выглядит полный бриф»</a>'}.`, "бриф описание шаблон пример что писать баннер техническое задание тз"],
+  ["Не приходят уведомления из Jira.", `Проверьте: вы в наблюдателях задачи (блок «Люди»); письма не уехали в папку по правилу Outlook или в спам; в профиле Jira не стоит «Не уведомлять меня». Если всё в порядке — напишите Богдану Миленковичу со ссылкой на задачу.`, "не приходят уведомления письма нет писем не получаю"],
+  ["Как получать уведомления по задаче?", `Добавьте себя и коллег в наблюдатели задачи: справа в задаче нажмите на число наблюдателей и найдите нужных людей.`, "уведомления наблюдатели подписаться"],
+  ["Слишком много писем от Jira. Как сократить?", `Автор задачи получает письмо о каждом действии: файл, комментарий, статус, дата. Полностью отключить письма самостоятельно нельзя, но их можно сократить: перенести уведомления в Таг, в профиле выключить письма о своих действиях и автоподписку, в Outlook увести письма Jira в отдельную папку. Пошагово — в ${'<a href="#notify">разделе «Уведомления»</a>'}.`, "уведомления письма почта много отключить сократить спам таг outlook писем приходит"],
+  ["Jira глючит или не работает кнопка.", `Напишите Богдану Миленковичу или оставьте заявку на ${A("https://help.corp.tander.ru/dwp/app/#/srm/profile/SRGv00ars00200SH438ESG3TMD3CRU/srm","портале Help")}.`, "ошибка глючит не работает сбой кнопка техническая help"],
+  ["Где научиться работать в Jira?", `Курсы на Магнуме: «Jira для стрима», «Jira для команд», «Основы Kanban». Ссылки — в ${'<a href="#links">разделе «Ссылки»</a>'}.`, "курс обучение научиться магнум"],
+];
+const faq = document.getElementById('faq'), q = document.getElementById('q'), results = document.getElementById('results'),
+      empty = document.getElementById('empty'), count = document.getElementById('count'), qclear = document.getElementById('qclear');
+const item = (qq,a,open) => `<details class="q" ${open?'open':''}><summary>${qq}</summary><div class="ans"><p>${a}</p></div></details>`;
+document.getElementById('faqall').innerHTML = FAQ.map(([qq,a]) => item(qq,a,false)).join('');
+const esc = s => s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+function render(term){
+  const STOP = new Set(['не','в','на','и','как','что','у','с','к','по','за','от','мне','я','где','ли','а','но']);
+  const words = term.trim().toLowerCase().replace(/ё/g,'е').split(/\s+/).filter(w => w && !STOP.has(w)).map(w => w.length >= 8 ? w.slice(0,-2) : w.length >= 5 ? w.slice(0,-1) : w);
+  qclear.hidden = !words.length;
+  if (!words.length){ results.hidden = true; faq.innerHTML = ''; return; }
+  const scored = FAQ.map(entry => {
+    const ye = x => x.toLowerCase().replace(/ё/g,'е'); const [qq,a,tags] = entry, t = ye(qq), tg = ye(tags), an = ye(a.replace(/<[^>]+>/g,''));
+    let score = 0;
+    for (const w of words){
+      if (t.includes(w)) score += 5; else if (tg.includes(w)) score += 3; else if (an.includes(w)) score += 1; else return null;
+    }
+    return {entry, score};
+  }).filter(Boolean).sort((x,y) => y.score - x.score);
+  const hits = scored.map(x => x.entry);
+  const hl = s => s.replace(new RegExp('('+words.map(esc).join('|')+')','gi'),'<mark>$1</mark>');
+  faq.innerHTML = hits.map(([qq,a],i) => item(hl(qq), a, i<3)).join('');
+  empty.hidden = hits.length > 0;
+  faq.hidden = hits.length === 0;
+  count.textContent = `Найдено: ${hits.length}`;
+  results.hidden = false;
+}
+q.addEventListener('input', () => render(q.value));
+qclear.addEventListener('click', () => { q.value=''; render(''); q.focus(); });
+document.querySelectorAll('.chip').forEach(c => c.addEventListener('click', () => {
+  q.value = c.dataset.q; render(q.value); results.scrollIntoView({block:'start', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'});
+}));
+/* burger */
+const burger = document.getElementById('burger'), menu = document.getElementById('menu');
+burger.addEventListener('click', () => { const o = menu.hidden; menu.hidden = !o; burger.setAttribute('aria-expanded', String(o)); });
+menu.querySelectorAll('a').forEach(a => a.addEventListener('click', () => { menu.hidden = true; burger.setAttribute('aria-expanded','false'); }));
+document.querySelectorAll('[data-copy]').forEach(b => b.addEventListener('click', () => {
+  const txt = b.dataset.copy, label = b.getAttribute('aria-label');
+  const done = () => { b.classList.add('ok'); b.setAttribute('aria-label','Скопировано'); setTimeout(() => { b.classList.remove('ok'); b.setAttribute('aria-label', label); }, 1600); };
+  const sel = () => { const r = document.createRange(); r.selectNodeContents(b.previousElementSibling);
+    const s = getSelection(); s.removeAllRanges(); s.addRange(r); };
+  try { navigator.clipboard.writeText(txt).then(done).catch(sel); } catch(_) { sel(); }
+}));
+render('');
+</script>
+
+</body>
+</html>
