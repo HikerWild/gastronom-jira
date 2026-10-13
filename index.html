@@ -342,6 +342,14 @@ mark{background:var(--warn-soft);color:var(--fg);border-radius:2px}
 .foot-meta{font-size:13px}
 .handle-l{font-family:var(--f-mono);font-size:.92em;user-select:all;color:var(--fg)}
 
+/* scroll to top */
+.totop{position:fixed;right:max(16px,env(safe-area-inset-right,0px));bottom:calc(env(safe-area-inset-bottom,0px) + 20px);z-index:30;width:48px;height:48px;border-radius:50%;border:1px solid var(--line-strong);background:color-mix(in srgb,var(--surface) 80%,transparent);backdrop-filter:blur(16px) saturate(160%);-webkit-backdrop-filter:blur(16px) saturate(160%);color:var(--fg);cursor:pointer;display:grid;place-items:center;box-shadow:var(--shadow);opacity:0;transform:translateY(8px);transition:opacity .2s,transform .2s}
+.totop.show{opacity:1;transform:none}
+.totop svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.totop:hover{border-color:var(--fg)}
+.totop:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){.totop{transition:none}}
+
 /* lightbox */
 dialog.lb{border:0;padding:0;background:transparent;max-width:min(96vw,1400px);width:auto}
 dialog.lb::backdrop{background:rgba(0,0,0,.72);backdrop-filter:blur(8px)}
@@ -356,9 +364,9 @@ dialog.lb button{position:absolute;top:8px;right:8px;width:36px;height:36px;bord
 
 <nav class="nav" aria-label="Разделы">
   <div class="nav-in">
-    <a class="brand" href="#top">Гастроном Медиа <span>Jira</span></a>
+    <a class="brand" href="#top">Гастроном Медиа</a>
     <div class="nav-links" id="navlinks">
-      <a href="#create">Новая задача</a><a href="#access">Вход</a><a href="#teams">Команды</a><a href="#statuses">Статусы</a><a href="#review">Правки</a><a href="#proof">Корректоры</a><a href="#notify">Уведомления</a><a href="#links">Ссылки</a><a href="#faq-sec">FAQ</a><a href="#contact">Контакты</a>
+      <a href="#create">Новая задача</a><a href="#access">Доступ в Jira</a><a href="#teams">Команды</a><a href="#statuses">Статусы</a><a href="#review">Правки</a><a href="#proof">Корректоры</a><a href="#notify">Уведомления</a><a href="#links">Ссылки</a><a href="#faq-sec">FAQ</a><a href="#contact">Контакты</a>
     </div>
     <button class="theme" id="theme" type="button" aria-label="Переключить тему" title="Светлая / тёмная тема">
       <svg class="sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
@@ -367,7 +375,7 @@ dialog.lb button{position:absolute;top:8px;right:8px;width:36px;height:36px;bord
     <button class="burger" id="burger" type="button" aria-label="Меню" aria-expanded="false" aria-controls="menu"><span></span><span></span></button>
   </div>
   <div class="menu" id="menu" hidden>
-    <a href="#create">Новая задача</a><a href="#access">Вход и доступ</a><a href="#teams">Команды и лиды</a><a href="#statuses">Статусы</a><a href="#review">Правки и общение</a><a href="#proof">Корректоры</a><a href="#notify">Уведомления</a><a href="#links">Ссылки</a><a href="#faq-sec">Частые вопросы</a><a href="#contact">Контакты</a>
+    <a href="#create">Новая задача</a><a href="#access">Доступ в Jira</a><a href="#teams">Команды и лиды</a><a href="#statuses">Статусы</a><a href="#review">Правки и общение</a><a href="#proof">Корректоры</a><a href="#notify">Уведомления</a><a href="#links">Ссылки</a><a href="#faq-sec">Частые вопросы</a><a href="#contact">Контакты</a>
   </div>
 </nav>
 
@@ -379,7 +387,6 @@ dialog.lb button{position:absolute;top:8px;right:8px;width:36px;height:36px;bord
       <span class="tag-line">Справочник заказчика</span>
     </div>
     <div class="hero-text">
-      <span class="eyebrow">Для заказчиков</span>
       <h1>Как поставить задачу в&nbsp;Jira</h1>
       <p class="lead">Выберите команду, подготовьте бриф и заполните поля по подсказкам. Здесь же — ответы на вопросы, которые обычно задают в чате.</p>
     </div>
@@ -522,8 +529,8 @@ dialog.lb button{position:absolute;top:8px;right:8px;width:36px;height:36px;bord
 
   <section class="panel" id="access" aria-labelledby="access-h">
     <div class="sec-head">
-      <span class="eyebrow">Перед стартом</span>
-      <h2 id="access-h">Вход и доступ</h2>
+      <span class="eyebrow">Раздел инструкции</span>
+      <h2 id="access-h">Доступ в Jira</h2>
       <p class="lead">Ваш аккаунт появляется в Jira только после первого входа. Пока вы не вошли, доступ к доске выдать нельзя.</p>
     </div>
     <div class="two">
@@ -689,14 +696,9 @@ dialog.lb button{position:absolute;top:8px;right:8px;width:36px;height:36px;bord
     </div>
   </section>
 
-  <footer class="foot">
-    <div class="foot-credit">
-      <span class="foot-title">Справочник сделала студия дизайна «Гастроном Медиа»</span>
-      <span>Такой же справочник для своего направления, брендинг, кампания или спецпроект — напишите руководителю студии Александру Кроткову: <span class="handle-l">krotkov_av@magnit.ru</span>. Вопросы по текущим задачам в Jira — Виктору Беню.</span>
-    </div>
-    <div class="foot-meta">Владелец справочника: Виктор Бень. Сверено с Jira 13.10.2026. Нашли ошибку или устаревшее — <span class="handle-l">ben_vg@magnit.ru</span></div>
-  </footer>
 </div>
+
+<button class="totop" id="totop" type="button" aria-label="Наверх" hidden><svg viewBox="0 0 24 24"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
 
 <dialog class="lb" id="lb"><img id="lbimg" src="" alt=""><div class="cap" id="lbcap"></div><button type="button" id="lbclose" aria-label="Закрыть">✕</button></dialog>
 
@@ -828,6 +830,12 @@ if (!noMotion && logoWrap){
   const onScroll = () => { sy = Math.min(40, window.scrollY * 0.12); setP(mx, my + sy); };
   window.addEventListener('scroll', onScroll, {passive:true});
 }
+
+/* кнопка наверх */
+const totop = document.getElementById('totop');
+const toggleTop = () => { const on = window.scrollY > 600; totop.hidden = false; totop.classList.toggle('show', on); };
+window.addEventListener('scroll', toggleTop, {passive:true}); toggleTop();
+totop.addEventListener('click', () => { window.scrollTo({top:0, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'}); document.getElementById('q').blur(); });
 
 /* brief copy + theme */
 const copyText = (txt, b) => {
