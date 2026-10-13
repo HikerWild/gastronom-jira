@@ -889,7 +889,20 @@ function render(term){
   empty.hidden = hits.length > 0;
   faq.hidden = hits.length === 0;
   count.textContent = `Найдено: ${hits.length}`;
+  const wasHidden = results.hidden;
   results.hidden = false;
+  if (wasHidden) revealResults();
+}
+let revealT;
+function revealResults(){
+  clearTimeout(revealT);
+  revealT = setTimeout(() => {
+    if (results.hidden) return;
+    const rt = results.getBoundingClientRect().top;
+    if (rt < innerHeight * 0.6) return;
+    const top = scrollY + q.getBoundingClientRect().top - 96;
+    scrollTo({top: Math.max(0, top), behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'});
+  }, 350);
 }
 q.addEventListener('input', () => render(q.value));
 qclear.addEventListener('click', () => { q.value=''; render(''); q.focus(); });
